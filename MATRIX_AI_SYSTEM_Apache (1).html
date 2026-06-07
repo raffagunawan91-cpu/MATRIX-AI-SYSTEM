@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="MATRIX AI SYSTEM - Next Generation AI Platform powered by Apache Engine. Features: AI Chat, Coder, Image Generator, Jailbreak Prompts, Documents, Search, Terminal.">
+<meta name="keywords" content="AI, Artificial Intelligence, Chatbot, Code Generator, Image Generator, Apache AI, Matrix AI, Gunawan Group">
+<meta name="author" content="anonymusXgunawan">
+<meta property="og:title" content="MATRIX AI SYSTEM - Support by Apache">
+<meta property="og:description" content="Next Generation AI Platform with Matrix cyberpunk theme">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#050505">
+<title>MATRIX AI SYSTEM — Support by Apache</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --neon: #00FF88;
+  --neon-dim: rgba(0, 255, 136, 0.15);
+  --neon-glow: rgba(0, 255, 136, 0.4);
+  --neon-dark: rgba(0, 255, 136, 0.08);
+  --bg: #050505;
+  --bg-elevated: #0a0a0a;
+  --bg-card: rgba(10, 10, 10, 0.85);
+  --bg-glass: rgba(15, 15, 15, 0.7);
+  --border: rgba(0, 255, 136, 0.2);
+  --border-hover: rgba(0, 255, 136, 0.5);
+  --text: #e0e0e0;
+  --text-muted: #888888;
+  --text-dim: #555555;
+  --danger: #ff4444;
+  --warning: #ffaa00;
+  --info: #00aaff;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+#matrixCanvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+  opacity: 0.35;
+}
+.scanlines {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+  opacity: 0.25;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--neon-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon); }
+
+/* ===== NAVIGATION ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 64px;
+  background: rgba(5, 5, 5, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 1.25rem;
+  color: var(--neon);
+  text-shadow: 0 0 20px var(--neon-glow);
+  cursor: pointer; user-select: none;
+}
+.nav-brand i { font-size: 1.5rem; }
+.nav-brand .sub {
+  font-size: 0.65rem; color: var(--text-muted);
+  font-weight: 400; letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: -4px;
+  font-family: 'Inter', sans-serif;
+}
+.nav-links {
+  display: flex; gap: 0.4rem;
+  list-style: none; align-items: center;
+}
+.nav-links a, .nav-links button {
+  color: var(--text-muted); text-decoration: none;
+  font-size: 0.8rem; font-weight: 500;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent; cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; gap: 0.35rem;
+  white-space: nowrap;
+}
+.nav-links a:hover, .nav-links button:hover {
+  color: var(--neon); border-color: var(--border);
+  background: var(--neon-dim);
+  text-shadow: 0 0 10px var(--neon-glow);
+}
+.nav-links a.active {
+  color: var(--neon); border-color: var(--neon);
+  background: var(--neon-dim);
+  box-shadow: 0 0 15px var(--neon-glow);
+}
+#mobileMenuBtn {
+  display: none; background: none; border: none;
+  color: var(--neon); font-size: 1.5rem; cursor: pointer;
+}
+
+/* ===== PAGES ===== */
+.page {
+  display: none;
+  position: relative; z-index: 1;
+  min-height: 100vh; padding-top: 64px;
+  animation: pageIn 0.4s ease;
+}
+.page.active { display: block; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: calc(100vh - 64px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem; position: relative;
+}
+.hero-content { max-width: 900px; text-align: center; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem; background: var(--neon-dim);
+  border: 1px solid var(--border); border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; color: var(--neon);
+  margin-bottom: 1rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+.hero-badge .dot {
+  width: 8px; height: 8px; background: var(--neon);
+  border-radius: 50%; box-shadow: 0 0 10px var(--neon);
+}
+.hero h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700; line-height: 1.1;
+  margin-bottom: 0.5rem; color: var(--neon);
+  text-shadow: 0 0 30px var(--neon-glow), 0 0 60px rgba(0,255,136,0.2);
+  letter-spacing: -0.02em;
+}
+.hero-subtitle {
+  font-size: 1.1rem; color: var(--text-muted);
+  margin-bottom: 2rem; font-weight: 300;
+}
+.hero-powered {
+  margin-top: 1rem; font-size: 0.7rem;
+  color: var(--text-dim); letter-spacing: 2px;
+  text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+}
+.hero-buttons {
+  display: flex; gap: 1rem;
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.btn {
+  padding: 0.875rem 2rem; border-radius: var(--radius);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  border: 1px solid transparent;
+}
+.btn-primary {
+  background: var(--neon); color: var(--bg);
+  border-color: var(--neon);
+  box-shadow: 0 0 20px var(--neon-glow);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px var(--neon-glow), 0 0 60px rgba(0,255,136,0.3);
+}
+.btn-secondary {
+  background: transparent; color: var(--neon);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  background: var(--neon-dim); border-color: var(--neon);
+  box-shadow: 0 0 20px var(--neon-glow);
+}
+.btn-danger {
+  background: transparent; color: var(--danger);
+  border-color: rgba(255,68,68,0.3);
+}
+.btn-danger:hover {
+  background: rgba(255,68,68,0.1); border-color: var(--danger);
+}
+
+/* Terminal Window */
+.terminal-window {
+  max-width: 700px; margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px rgba(0,255,136,0.1);
+}
+.terminal-header {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0,255,136,0.05);
+  border-bottom: 1px solid var(--border);
+}
+.terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+.terminal-dot.red { background: #ff5f56; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #27c93f; }
+.terminal-title {
+  margin-left: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; color: var(--text-muted);
+}
+.terminal-body {
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; line-height: 1.8;
+  color: var(--neon); min-height: 160px; text-align: left;
+}
+.terminal-body .prompt { color: var(--text-muted); }
+.terminal-body .cursor {
+  display: inline-block; width: 8px; height: 1.2em;
+  background: var(--neon);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom; margin-left: 2px;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ===== FEATURES ===== */
+.features-section {
+  padding: 4rem 2rem;
+  max-width: 1400px; margin: 0 auto;
+}
+.section-header {
+  text-align: center; margin-bottom: 3rem;
+}
+.section-header h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2rem; color: var(--neon);
+  text-shadow: 0 0 20px var(--neon-glow);
+  margin-bottom: 0.5rem;
+}
+.section-header p { color: var(--text-muted); font-size: 1rem; }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.feature-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 2rem; cursor: pointer;
+  transition: var(--transition);
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.feature-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-hover);
+  box-shadow: 0 10px 40px rgba(0,255,136,0.15), 0 0 60px rgba(0,255,136,0.05);
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+  width: 48px; height: 48px;
+  background: var(--neon-dim);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; color: var(--neon);
+  margin-bottom: 1rem;
+  box-shadow: 0 0 15px var(--neon-dim);
+}
+.feature-card h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem; color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.feature-card p {
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;
+}
+.feature-tag {
+  display: inline-block; margin-top: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--neon-dim);
+  border: 1px solid var(--border); border-radius: 99px;
+  font-size: 0.7rem; color: var(--neon);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content {
+  max-width: 1400px; margin: 0 auto; padding: 2rem;
+}
+.page-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+}
+.page-header h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.75rem; color: var(--neon);
+  text-shadow: 0 0 15px var(--neon-glow);
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.page-header p { color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem; }
+
+.glass-panel {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem; backdrop-filter: blur(10px);
+  margin-bottom: 1.5rem;
+}
+.glass-panel h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem; color: var(--neon);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+/* ===== CHAT ===== */
+.chat-container {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 180px); min-height: 500px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
+}
+.chat-messages {
+  flex: 1; overflow-y: auto;
+  padding: 1.5rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.chat-message {
+  display: flex; gap: 0.75rem;
+  max-width: 85%;
+  animation: msgIn 0.3s ease;
+}
+.chat-message.user { flex-direction: row-reverse; align-self: flex-end; }
+.chat-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700;
+  flex-shrink: 0; font-family: 'JetBrains Mono', monospace;
+}
+.chat-message.ai .chat-avatar {
+  background: var(--neon-dim); color: var(--neon);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 10px var(--neon-dim);
+}
+.chat-message.user .chat-avatar {
+  background: rgba(255,255,255,0.1); color: var(--text);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.chat-bubble {
+  padding: 1rem 1.25rem; border-radius: var(--radius);
+  font-size: 0.9rem; line-height: 1.6; word-wrap: break-word;
+}
+.chat-message.ai .chat-bubble {
+  background: rgba(0,255,136,0.05);
+  border: 1px solid var(--border); color: var(--text);
+}
+.chat-message.user .chat-bubble {
+  background: var(--neon-dim);
+  border: 1px solid var(--neon); color: var(--neon);
+}
+.chat-bubble pre {
+  background: rgba(0,0,0,0.5); padding: 1rem;
+  border-radius: var(--radius-sm); overflow-x: auto;
+  margin: 0.75rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; border: 1px solid var(--border);
+}
+.chat-bubble code {
+  background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: var(--neon);
+}
+.chat-bubble img {
+  max-width: 100%; border-radius: 12px; margin-top: 8px;
+  border: 1px solid var(--border);
+}
+.chat-bubble .img-loading {
+  width: 100%; height: 200px;
+  background: rgba(0,255,136,0.03);
+  border-radius: 12px; display: flex;
+  align-items: center; justify-content: center;
+  color: var(--text-muted); font-size: 0.85rem;
+  border: 1px solid var(--border);
+}
+.chat-bubble .img-caption {
+  font-size: 0.8rem; color: var(--text-muted);
+  margin-top: 8px; font-style: italic;
+}
+.chat-input-area {
+  padding: 1rem; border-top: 1px solid var(--border);
+  background: rgba(5,5,5,0.9);
+  display: flex; gap: 0.75rem; align-items: flex-end;
+}
+.chat-input {
+  flex: 1; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 0.75rem 1rem; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  resize: none; min-height: 48px; max-height: 120px;
+  outline: none; transition: var(--transition);
+}
+.chat-input:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 15px var(--neon-dim);
+}
+.chat-input::placeholder { color: var(--text-dim); }
+.chat-send-btn {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--neon); border: none; color: var(--bg);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); flex-shrink: 0;
+  box-shadow: 0 0 15px var(--neon-glow);
+}
+.chat-send-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px var(--neon-glow);
+}
+.chat-send-btn:disabled {
+  opacity: 0.5; cursor: not-allowed; transform: none;
+}
+.chat-tools {
+  display: flex; gap: 0.5rem;
+  padding: 0.5rem 1rem; border-top: 1px solid var(--border);
+  background: rgba(5,5,5,0.9);
+}
+.chat-tool-btn {
+  padding: 0.4rem 0.75rem; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-muted); font-size: 0.75rem;
+  cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.chat-tool-btn:hover, .chat-tool-btn.active {
+  color: var(--neon); border-color: var(--neon);
+  background: var(--neon-dim);
+}
+.chat-mode-indicator {
+  padding: 0.4rem 0.75rem;
+  background: var(--neon-dim);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 0.75rem; color: var(--neon);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 0.4rem;
+  margin: 0 1rem;
+}
+
+/* ===== CODER ===== */
+.coder-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 180px); min-height: 500px;
+}
+.coder-sidebar {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem; overflow-y: auto;
+}
+.coder-sidebar h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: var(--neon);
+  margin-bottom: 1rem;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.lang-btn {
+  width: 100%; padding: 0.75rem;
+  background: transparent; border: 1px solid transparent;
+  border-radius: var(--radius-sm); color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.lang-btn:hover, .lang-btn.active {
+  background: var(--neon-dim); border-color: var(--neon);
+  color: var(--neon);
+}
+.coder-main {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.coder-editor {
+  flex: 1; background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.editor-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(0,255,136,0.05);
+  border-bottom: 1px solid var(--border);
+}
+.editor-header span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: var(--neon);
+}
+.editor-actions { display: flex; gap: 0.5rem; }
+.editor-actions button {
+  padding: 0.4rem 0.75rem; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-muted); font-size: 0.75rem;
+  cursor: pointer; transition: var(--transition);
+  font-family: 'JetBrains Mono', monospace;
+}
+.editor-actions button:hover {
+  border-color: var(--neon); color: var(--neon);
+  background: var(--neon-dim);
+}
+.code-textarea {
+  flex: 1; background: transparent; border: none;
+  padding: 1rem; color: var(--neon);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; line-height: 1.6;
+  resize: none; outline: none;
+}
+.code-textarea::placeholder { color: var(--text-dim); }
+.coder-prompt {
+  padding: 1rem; background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  display: flex; gap: 0.75rem;
+}
+.coder-prompt input {
+  flex: 1; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem; color: var(--text); font-size: 0.9rem;
+  outline: none;
+}
+.coder-prompt input:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 15px var(--neon-dim);
+}
+
+/* ===== IMAGE ===== */
+.image-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.image-panel {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem;
+}
+.image-panel h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem; color: var(--neon); margin-bottom: 1rem;
+}
+.image-input {
+  width: 100%; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 1rem; color: var(--text); font-size: 0.9rem;
+  margin-bottom: 1rem; outline: none; resize: vertical;
+  min-height: 100px; font-family: 'Inter', sans-serif;
+}
+.image-input:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 15px var(--neon-dim);
+}
+.image-preview {
+  width: 100%; min-height: 300px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 0.9rem; overflow: hidden;
+}
+.image-preview img { width: 100%; height: 100%; object-fit: cover; }
+.image-options {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem; margin-bottom: 1rem;
+}
+.image-options select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0.5rem; color: var(--text); font-size: 0.85rem;
+  outline: none;
+}
+
+/* ===== JAILBREAK ===== */
+.jailbreak-layout {
+  display: grid; grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 180px); min-height: 500px;
+}
+.jb-sidebar {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.jb-sidebar-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); margin: 1rem 0 0.5rem;
+}
+.jb-cat-list { display: flex; flex-direction: column; gap: 0.25rem; }
+.jb-cat-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 0.75rem; border-radius: var(--radius-sm);
+  border: 1px solid transparent; background: transparent;
+  color: var(--text-muted); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: var(--transition); text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+}
+.jb-cat-item:hover {
+  background: var(--neon-dim); color: var(--text);
+  border-color: var(--border);
+}
+.jb-cat-item.active {
+  background: var(--neon-dim); color: var(--neon);
+  border-color: var(--neon);
+  box-shadow: 0 0 10px var(--neon-dim);
+}
+.jb-cat-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 600;
+  background: var(--neon-dim); padding: 0.15rem 0.4rem;
+  border-radius: 4px; color: var(--neon);
+}
+.jb-main { overflow-y: auto; }
+.jb-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.jb-search-box {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  transition: var(--transition); max-width: 320px; width: 100%;
+}
+.jb-search-box:focus-within {
+  border-color: var(--neon);
+  box-shadow: 0 0 15px var(--neon-dim);
+}
+.jb-search-box input {
+  flex: 1; border: none; background: transparent;
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 0.85rem; outline: none;
+}
+.jb-search-box input::placeholder { color: var(--text-dim); }
+.jb-filters { display: flex; align-items: center; gap: 0.5rem; }
+.jb-select {
+  padding: 0.5rem 0.75rem; background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; outline: none; cursor: pointer;
+}
+.jb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+.jb-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem; cursor: pointer;
+  transition: var(--transition); position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.jb-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-hover);
+  box-shadow: 0 10px 40px rgba(0,255,136,0.15);
+}
+.jb-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.jb-card:hover::before { opacity: 1; }
+.jb-card-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem; border-radius: 4px;
+  background: var(--neon-dim); color: var(--neon);
+  border: 1px solid var(--border);
+}
+.jb-card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem; font-weight: 600; color: var(--text);
+  margin: 0.75rem 0 0.4rem; line-height: 1.4;
+}
+.jb-card-desc {
+  font-size: 0.8rem; color: var(--neon); margin-bottom: 0.5rem; font-weight: 500;
+}
+.jb-card-preview {
+  font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden; flex: 1;
+}
+.jb-card-stats {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-top: 1rem; padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.jb-char-count {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 600;
+  padding: 0.25rem 0.5rem; border-radius: 4px;
+}
+.jb-char-count.short { color: #4ade80; background: rgba(74,222,128,0.1); }
+.jb-char-count.medium { color: #fbbf24; background: rgba(251,191,36,0.1); }
+.jb-char-count.long { color: #f87171; background: rgba(248,113,113,0.1); }
+.jb-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 0.75rem;
+}
+.jb-card-actions { display: flex; gap: 0.5rem; }
+.jb-copy-btn, .jb-download-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 600; cursor: pointer;
+  transition: var(--transition);
+}
+.jb-copy-btn:hover, .jb-download-btn:hover {
+  background: var(--neon); border-color: var(--neon); color: var(--bg);
+}
+.jb-copy-btn.ok, .jb-download-btn.ok {
+  background: #10b981; border-color: #10b981; color: white;
+}
+.jb-card-date { font-size: 0.7rem; color: var(--text-dim); }
+.jb-new-badge {
+  display: inline-flex; align-items: center;
+  padding: 0.15rem 0.5rem;
+  background: linear-gradient(135deg, var(--neon), #00cc6a);
+  color: var(--bg); font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-radius: 4px;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(0,255,136,0.3);
+}
+.jb-empty { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted); }
+.jb-empty h3 { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; color: var(--text); margin-bottom: 0.5rem; }
+.jb-loader { grid-column: 1/-1; display: flex; justify-content: center; align-items: center; padding: 3rem; }
+.jb-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--neon-dim); border-top-color: var(--neon);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.jb-pagination {
+  display: flex; justify-content: center; align-items: center;
+  gap: 0.5rem; margin-top: 2rem; padding-bottom: 2rem;
+}
+.jb-page-btn {
+  min-width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 0.75rem; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-glass);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  transition: var(--transition);
+}
+.jb-page-btn:hover:not(:disabled) {
+  border-color: var(--neon); color: var(--neon);
+  background: var(--neon-dim);
+}
+.jb-page-btn.active {
+  background: var(--neon); border-color: var(--neon); color: var(--bg);
+}
+.jb-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Jailbreak Modal */
+.jb-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  z-index: 10000; display: flex; align-items: center; justify-content: center;
+  padding: 1rem; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.jb-overlay.open { opacity: 1; pointer-events: all; }
+.jb-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  width: 100%; max-width: 680px; max-height: 85vh;
+  overflow-y: auto;
+  transform: scale(0.95) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+.jb-overlay.open .jb-modal { transform: scale(1) translateY(0); }
+.jb-modal-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 1.5rem 1.5rem 0; gap: 1rem;
+}
+.jb-modal-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem; border-radius: 4px;
+  background: var(--neon-dim); color: var(--neon);
+  border: 1px solid var(--border); margin-bottom: 0.5rem;
+}
+.jb-modal-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem; font-weight: 600; color: var(--text);
+  margin-bottom: 0.5rem; line-height: 1.3;
+}
+.jb-modal-meta { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+.jb-modal-desc { font-size: 0.85rem; color: var(--neon); font-weight: 500; }
+.jb-modal-stats {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.5rem 0; border-top: 1px dashed var(--border);
+  flex-wrap: wrap;
+}
+.jb-stat-item { display: flex; flex-direction: column; gap: 0.15rem; }
+.jb-stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+.jb-stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.jb-stat-value.short { color: #4ade80; }
+.jb-stat-value.medium { color: #fbbf24; }
+.jb-stat-value.long { color: #f87171; }
+.jb-close-btn {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-glass);
+  color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); flex-shrink: 0;
+}
+.jb-close-btn:hover { border-color: var(--neon); color: var(--neon); background: var(--neon-dim); }
+.jb-modal-body { padding: 0 1.5rem 1.5rem; }
+.jb-prompt-content {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; line-height: 1.7; color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 300px; overflow-y: auto;
+}
+.jb-modal-footer { padding: 0 1.5rem 1.5rem; }
+.jb-modal-copy {
+  width: 100%; padding: 0.875rem;
+  background: var(--neon); border: none; border-radius: var(--radius);
+  color: var(--bg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  transition: var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 0 15px var(--neon-glow);
+}
+.jb-modal-copy:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px var(--neon-glow);
+}
+.jb-modal-copy.ok { background: #10b981; }
+
+.jb-copy-notification {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0.8);
+  background: var(--bg-card);
+  border: 2px solid #10b981; border-radius: 50%;
+  width: 100px; height: 100px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.25rem;
+  z-index: 10001; opacity: 0; pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 40px rgba(16,185,129,0.3);
+}
+.jb-copy-notification.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+.jb-copy-notification svg { width: 28px; height: 28px; color: #10b981; }
+.jb-copy-notification .progress-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.jb-copy-notification .progress-ring circle { stroke: #10b981; stroke-width: 3; fill: transparent; stroke-dasharray: 282.743; stroke-dashoffset: 0; transition: stroke-dashoffset 0.3s linear; filter: drop-shadow(0 0 6px #10b981); }
+.jb-copy-notification .progress-text { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: var(--text); margin-top: 0.15rem; }
+
+/* ===== DOCS ===== */
+.doc-upload {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 3rem; text-align: center;
+  transition: var(--transition); cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+.doc-upload:hover {
+  border-color: var(--neon); background: var(--neon-dim);
+}
+.doc-upload i { font-size: 3rem; color: var(--neon); margin-bottom: 1rem; }
+.doc-upload h3 { color: var(--text); margin-bottom: 0.5rem; }
+.doc-upload p { color: var(--text-muted); font-size: 0.85rem; }
+
+/* ===== SEARCH ===== */
+.search-box-large {
+  display: flex; gap: 0.75rem; margin-bottom: 2rem;
+}
+.search-box-large input {
+  flex: 1; background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem 1.25rem; color: var(--text); font-size: 1rem;
+  outline: none; transition: var(--transition);
+}
+.search-box-large input:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 20px var(--neon-dim);
+}
+.search-results { display: flex; flex-direction: column; gap: 1rem; }
+.search-result-item {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.25rem; transition: var(--transition);
+}
+.search-result-item:hover {
+  border-color: var(--border-hover);
+  transform: translateX(4px);
+}
+
+/* ===== TERMINAL ===== */
+.terminal-full {
+  background: var(--bg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  height: calc(100vh - 180px); min-height: 500px;
+  display: flex; flex-direction: column; overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+}
+.terminal-output {
+  flex: 1; overflow-y: auto; padding: 1.5rem;
+  font-size: 0.85rem; line-height: 1.8;
+}
+.terminal-line { margin-bottom: 0.25rem; }
+.terminal-line .cmd { color: var(--neon); }
+.terminal-line .out { color: var(--text); }
+.terminal-line .err { color: var(--danger); }
+.terminal-line .warn { color: var(--warning); }
+.terminal-line .info { color: var(--info); }
+.terminal-line .sys { color: var(--text-muted); }
+.terminal-input-line {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+  background: rgba(0,255,136,0.02);
+}
+.terminal-input-line .prompt {
+  color: var(--neon); font-weight: 600; white-space: nowrap;
+}
+.terminal-input-line input {
+  flex: 1; background: transparent; border: none;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; outline: none;
+}
+
+/* ===== DASHBOARD ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem; margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem; transition: var(--transition);
+}
+.stat-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 20px var(--neon-dim);
+}
+.stat-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.stat-card-header i { font-size: 1.5rem; color: var(--neon); }
+.stat-card-header span {
+  font-size: 0.75rem; color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2rem; font-weight: 700; color: var(--neon);
+  text-shadow: 0 0 10px var(--neon-glow);
+}
+.stat-label {
+  font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;
+}
+.chart-container {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem; height: 300px; position: relative;
+}
+.chart-container canvas { width: 100%; height: 100%; }
+
+/* ===== SECURITY ===== */
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.security-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 0; border-bottom: 1px solid var(--border);
+}
+.security-item:last-child { border-bottom: none; }
+.toggle-switch {
+  position: relative; width: 44px; height: 24px;
+  background: var(--text-dim); border-radius: 12px;
+  cursor: pointer; transition: var(--transition);
+}
+.toggle-switch.active {
+  background: var(--neon);
+  box-shadow: 0 0 10px var(--neon-glow);
+}
+.toggle-switch::after {
+  content: ''; position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: white; border-radius: 50%;
+  transition: var(--transition);
+}
+.toggle-switch.active::after { left: 22px; }
+
+/* ===== API ===== */
+.api-key-box {
+  display: flex; gap: 0.75rem; align-items: center;
+  padding: 1rem; background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; margin-bottom: 1rem;
+}
+.api-key-box input {
+  flex: 1; background: transparent; border: none;
+  color: var(--neon);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; outline: none;
+}
+
+/* ===== SETTINGS ===== */
+.settings-group { margin-bottom: 2rem; }
+.settings-group h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem; color: var(--neon);
+  margin-bottom: 1rem; padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0,255,136,0.05);
+}
+.setting-info h4 { font-size: 0.95rem; color: var(--text); margin-bottom: 0.25rem; }
+.setting-info p { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ===== CONTACT ===== */
+.contact-form { max-width: 600px; }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label {
+  display: block; font-size: 0.85rem;
+  color: var(--text-muted); margin-bottom: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.form-group input, .form-group textarea {
+  width: 100%; background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem; color: var(--text);
+  font-size: 0.9rem; outline: none;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
+}
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 15px var(--neon-dim);
+}
+.form-group textarea { resize: vertical; min-height: 120px; }
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border); padding: 2rem;
+  text-align: center; background: rgba(5,5,5,0.95);
+  position: relative; z-index: 1;
+}
+footer .brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem; font-weight: 700; color: var(--neon);
+  text-shadow: 0 0 20px var(--neon-glow); margin-bottom: 0.5rem;
+}
+footer p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ===== UTILITIES ===== */
+.matrix-loader {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 2rem;
+}
+.matrix-loader span {
+  width: 8px; height: 8px; background: var(--neon);
+  border-radius: 50%; animation: loaderPulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--neon);
+}
+.matrix-loader span:nth-child(2) { animation-delay: 0.2s; }
+.matrix-loader span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes loaderPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+.toast {
+  position: fixed; top: 80px; right: 20px;
+  padding: 1rem 1.5rem; background: var(--bg-glass);
+  border: 1px solid var(--neon); border-radius: var(--radius);
+  color: var(--neon);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  box-shadow: 0 0 30px var(--neon-glow);
+  transform: translateX(150%);
+  transition: transform 0.3s ease;
+  z-index: 10000;
+}
+.toast.show { transform: translateX(0); }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+.glitch:hover { animation: glitch 0.3s ease; }
+
+.model-selector select {
+  padding: 0.4rem 2rem 0.4rem 0.75rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; cursor: pointer; outline: none;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='https://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300FF88' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.model-selector select option { background: #0a0a0a; color: var(--text); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .coder-layout { grid-template-columns: 1fr; }
+  .image-layout { grid-template-columns: 1fr; }
+  .jailbreak-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  #mobileMenuBtn { display: block; }
+  .hero h1 { font-size: 2.5rem; }
+  .page-content { padding: 1rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .security-grid { grid-template-columns: 1fr; }
+  .chat-message { max-width: 95%; }
+  .jb-grid { grid-template-columns: 1fr; }
+  .jb-header { flex-direction: column; align-items: stretch; }
+  .jb-search-box { max-width: 100%; }
+}
+
+.mobile-menu {
+  position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+  background: rgba(5,5,5,0.98); z-index: 999;
+  padding: 2rem; display: none;
+  flex-direction: column; gap: 1rem;
+}
+.mobile-menu.show { display: flex; }
+.mobile-menu a {
+  color: var(--text); text-decoration: none;
+  font-size: 1.25rem; padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+}
+.mobile-menu a:hover { color: var(--neon); }
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+<div class="scanlines"></div>
+
+<nav>
+  <div class="nav-brand" onclick="navigateTo('home')">
+    <i class="fas fa-network-wired"></i>
+    <div>
+      MATRIX AI
+      <span class="sub">Support by Apache</span>
+    </div>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" onclick="navigateTo('home'); return false;" data-page="home" class="active"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="#" onclick="navigateTo('chat'); return false;" data-page="chat"><i class="fas fa-comments"></i> Chat</a></li>
+    <li><a href="#" onclick="navigateTo('coder'); return false;" data-page="coder"><i class="fas fa-code"></i> Coder</a></li>
+    <li><a href="#" onclick="navigateTo('image'); return false;" data-page="image"><i class="fas fa-image"></i> Image</a></li>
+    <li><a href="#" onclick="navigateTo('jailbreak'); return false;" data-page="jailbreak"><i class="fas fa-bolt"></i> Jailbreak</a></li>
+    <li><a href="#" onclick="navigateTo('documents'); return false;" data-page="documents"><i class="fas fa-file-alt"></i> Docs</a></li>
+    <li><a href="#" onclick="navigateTo('search'); return false;" data-page="search"><i class="fas fa-search"></i> Search</a></li>
+    <li><a href="#" onclick="navigateTo('terminal'); return false;" data-page="terminal"><i class="fas fa-terminal"></i> Terminal</a></li>
+    <li><a href="#" onclick="navigateTo('dashboard'); return false;" data-page="dashboard"><i class="fas fa-chart-line"></i> Dash</a></li>
+    <li><a href="#" onclick="navigateTo('security'); return false;" data-page="security"><i class="fas fa-shield-alt"></i> Sec</a></li>
+    <li><a href="#" onclick="navigateTo('settings'); return false;" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
+  </ul>
+  <button id="mobileMenuBtn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="navigateTo('home'); toggleMobileMenu(); return false;">Home</a>
+  <a href="#" onclick="navigateTo('chat'); toggleMobileMenu(); return false;">AI Chat</a>
+  <a href="#" onclick="navigateTo('coder'); toggleMobileMenu(); return false;">AI Coder</a>
+  <a href="#" onclick="navigateTo('image'); toggleMobileMenu(); return false;">AI Image</a>
+  <a href="#" onclick="navigateTo('jailbreak'); toggleMobileMenu(); return false;">AI Jailbreak</a>
+  <a href="#" onclick="navigateTo('documents'); toggleMobileMenu(); return false;">AI Documents</a>
+  <a href="#" onclick="navigateTo('search'); toggleMobileMenu(); return false;">AI Search</a>
+  <a href="#" onclick="navigateTo('terminal'); toggleMobileMenu(); return false;">AI Terminal</a>
+  <a href="#" onclick="navigateTo('dashboard'); toggleMobileMenu(); return false;">Dashboard</a>
+  <a href="#" onclick="navigateTo('security'); toggleMobileMenu(); return false;">Security</a>
+  <a href="#" onclick="navigateTo('settings'); toggleMobileMenu(); return false;">Settings</a>
+</div>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        APACHE ENGINE ONLINE — v2.00
+      </div>
+      <h1 class="glitch">MATRIX AI SYSTEM</h1>
+      <p class="hero-subtitle">Next Generation Artificial Intelligence Platform — Support by Apache AI 2.00</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary" onclick="navigateTo('chat')">
+          <i class="fas fa-rocket"></i> Launch AI
+        </button>
+        <button class="btn btn-secondary" onclick="navigateTo('jailbreak')">
+          <i class="fas fa-bolt"></i> Jailbreak
+        </button>
+        <button class="btn btn-secondary" onclick="navigateTo('terminal')">
+          <i class="fas fa-terminal"></i> Terminal
+        </button>
+      </div>
+      <div class="hero-powered">Powered by Apache Engine System — Gunawan Group — 100% Gratis & Aman</div>
+      <div class="terminal-window" style="margin-top:2rem">
+        <div class="terminal-header">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <span class="terminal-title">apache@matrix:~</span>
+        </div>
+        <div class="terminal-body" id="heroTerminal">
+          <span class="prompt">$</span> initializing_apache_engine...<br>
+          <span class="prompt">$</span> loading_matrix_neural_networks...<br>
+          <span class="prompt">$</span> <span id="terminalType"></span><span class="cursor"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="features-section" id="featuresSection">
+    <div class="section-header">
+      <h2>// FEATURE_MODULES</h2>
+      <p>Advanced AI capabilities powered by Apache Engine + Matrix Neural Net</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" onclick="navigateTo('chat')">
+        <div class="feature-icon"><i class="fas fa-comments"></i></div>
+        <h3>AI CHAT</h3>
+        <p>Real-time conversation with Apache Engine. Multi-model support: Apache, GPT-5, Gemini, Claude.</p>
+        <span class="feature-tag">REAL-TIME</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('coder')">
+        <div class="feature-icon"><i class="fas fa-code"></i></div>
+        <h3>AI CODER</h3>
+        <p>Generate HTML, CSS, JS, Python, PHP with Apache VS Code mode. Clean code & best practices.</p>
+        <span class="feature-tag">GENERATE</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('image')">
+        <div class="feature-icon"><i class="fas fa-image"></i></div>
+        <h3>AI IMAGE</h3>
+        <p>Text-to-image generation via Pollinations AI. Cyberpunk, realistic, anime, 3D styles.</p>
+        <span class="feature-tag">GENERATE</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('jailbreak')">
+        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+        <h3>AI JAILBREAK</h3>
+        <p>Curated prompt collection by Gunawan Group. Explore, copy, and download premium prompts.</p>
+        <span class="feature-tag">EXPLORE</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('documents')">
+        <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+        <h3>AI DOCUMENT</h3>
+        <p>PDF reader, summarizer, DOCX analyzer, and OCR scanner for document intelligence.</p>
+        <span class="feature-tag">ANALYZE</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('search')">
+        <div class="feature-icon"><i class="fas fa-search"></i></div>
+        <h3>AI SEARCH</h3>
+        <p>Internet search, knowledge base, news aggregation, and research assistant.</p>
+        <span class="feature-tag">SEARCH</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('terminal')">
+        <div class="feature-icon"><i class="fas fa-terminal"></i></div>
+        <h3>AI TERMINAL</h3>
+        <p>Cyberpunk terminal simulation with command history, log monitoring, and system dashboard.</p>
+        <span class="feature-tag">SIMULATE</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('dashboard')">
+        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>DASHBOARD</h3>
+        <p>User statistics, AI usage analytics, API monitoring, and performance metrics.</p>
+        <span class="feature-tag">ANALYTICS</span>
+      </div>
+      <div class="feature-card" onclick="navigateTo('security')">
+        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+        <h3>SECURITY CENTER</h3>
+        <p>2FA authentication, session management, device monitoring, and activity logs.</p>
+        <span class="feature-tag">PROTECT</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== CHAT PAGE ==================== -->
+<div class="page" id="page-chat">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-comments"></i> AI CHAT MODULE</h2>
+      <p>Real-time intelligent conversation — Powered by Apache Engine System</p>
+    </div>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message ai">
+          <div class="chat-avatar">AI</div>
+          <div class="chat-bubble">
+            <strong>MATRIX AI SYSTEM</strong> online.<br><br>
+            Saya adalah asisten AI generasi berikutnya yang diciptakan oleh <strong>anonymusXgunawan</strong> dengan <strong>Apache Engine System</strong>. Saya siap membantu Anda dengan coding, analisis dokumen, generate gambar, riset, dan banyak lagi.<br><br>
+            Status: <span style="color: var(--neon)">● Online</span> | Engine: <span style="color: var(--neon)">Apache Neural v2.0</span> | Model: <span style="color: var(--neon)">Apache AI</span>
+          </div>
+        </div>
+      </div>
+      <div class="chat-tools">
+        <button class="chat-tool-btn" onclick="clearChat()" title="Clear Chat"><i class="fas fa-trash"></i> Clear</button>
+        <button class="chat-tool-btn" onclick="toggleVoice()" title="Voice Input"><i class="fas fa-microphone"></i> Voice</button>
+        <button class="chat-tool-btn" onclick="exportChat()" title="Export Chat"><i class="fas fa-download"></i> Export</button>
+        <button class="chat-tool-btn" onclick="document.getElementById('chatFile').click()" title="Upload File"><i class="fas fa-paperclip"></i> File</button>
+        <input type="file" id="chatFile" style="display:none" multiple onchange="handleChatFile(this)">
+        <button class="chat-tool-btn" onclick="setChatMode('search')" id="btnModeSearch"><i class="fas fa-globe"></i> Web</button>
+        <button class="chat-tool-btn" onclick="setChatMode('coding')" id="btnModeCoding"><i class="fas fa-code"></i> Code</button>
+        <button class="chat-tool-btn" onclick="setChatMode('image')" id="btnModeImage"><i class="fas fa-image"></i> Img</button>
+        <div class="chat-mode-indicator" id="chatModeIndicator" style="display:none;">
+          <i class="fas fa-circle" style="font-size:0.5rem"></i>
+          <span id="chatModeText">Mode Chat</span>
+        </div>
+        <div style="flex:1"></div>
+        <div class="model-selector">
+          <select id="modelSelector" onchange="changeModel(this.value)">
+            <option value="apache">Apache AI</option>
+            <option value="gpt5">GPT-5</option>
+            <option value="gemini">Gemini</option>
+            <option value="claude">Claude</option>
+          </select>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chatInput" placeholder="Tanyakan apa saja..." rows="1"></textarea>
+        <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CODER PAGE ==================== -->
+<div class="page" id="page-coder">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-code"></i> AI CODER MODULE</h2>
+      <p>Generate and debug code with Apache VS Code Mode</p>
+    </div>
+    <div class="coder-layout">
+      <div class="coder-sidebar">
+        <h4>// LANGUAGES</h4>
+        <button class="lang-btn active" onclick="setLang('html')" data-lang="html"><i class="fab fa-html5"></i> HTML</button>
+        <button class="lang-btn" onclick="setLang('css')" data-lang="css"><i class="fab fa-css3-alt"></i> CSS</button>
+        <button class="lang-btn" onclick="setLang('javascript')" data-lang="javascript"><i class="fab fa-js"></i> JavaScript</button>
+        <button class="lang-btn" onclick="setLang('python')" data-lang="python"><i class="fab fa-python"></i> Python</button>
+        <button class="lang-btn" onclick="setLang('php')" data-lang="php"><i class="fab fa-php"></i> PHP</button>
+        <h4 style="margin-top:1.5rem">// TOOLS</h4>
+        <button class="lang-btn" onclick="copyCode()"><i class="fas fa-copy"></i> Copy</button>
+        <button class="lang-btn" onclick="downloadCode()"><i class="fas fa-download"></i> Download</button>
+        <button class="lang-btn" onclick="clearCode()"><i class="fas fa-trash"></i> Clear</button>
+      </div>
+      <div class="coder-main">
+        <div class="coder-editor">
+          <div class="editor-header">
+            <span id="editorFilename">untitled.html</span>
+            <div class="editor-actions">
+              <button onclick="runCode()"><i class="fas fa-play"></i> Run</button>
+              <button onclick="formatCode()"><i class="fas fa-magic"></i> Format</button>
+            </div>
+          </div>
+          <textarea class="code-textarea" id="codeEditor" placeholder="// Kode akan muncul di sini...&#10;// Ketik prompt di bawah untuk generate kode dengan Apache AI"></textarea>
+        </div>
+        <div class="coder-prompt">
+          <input type="text" id="codePrompt" placeholder="Deskripsikan kode yang ingin dibuat (contoh: buat landing page modern)...">
+          <button class="btn btn-primary" onclick="generateCode()">
+            <i class="fas fa-robot"></i> Generate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== IMAGE PAGE ==================== -->
+<div class="page" id="page-image">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-image"></i> AI IMAGE MODULE</h2>
+      <p>Generate images with Pollinations AI — Support by Apache</p>
+    </div>
+    <div class="image-layout">
+      <div class="image-panel">
+        <h3><i class="fas fa-sliders-h"></i> Configuration</h3>
+        <textarea class="image-input" id="imagePrompt" placeholder="Deskripsikan gambar yang ingin dibuat secara detail..."></textarea>
+        <div class="image-options">
+          <select id="imageSize">
+            <option value="1024x1024">1024 x 1024</option>
+            <option value="1024x768">1024 x 768</option>
+            <option value="768x1024">768 x 1024</option>
+            <option value="512x512">512 x 512</option>
+          </select>
+          <select id="imageStyle">
+            <option value="">Default Style</option>
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="realistic">Realistic</option>
+            <option value="anime">Anime</option>
+            <option value="3d">3D Render</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="generateImage()">
+          <i class="fas fa-wand-magic-sparkles"></i> Generate Image
+        </button>
+        <div style="margin-top:1rem; display:flex; gap:0.5rem;">
+          <button class="btn btn-secondary" style="flex:1" onclick="enhanceImage()">
+            <i class="fas fa-magic"></i> Enhance
+          </button>
+          <button class="btn btn-secondary" style="flex:1" onclick="removeBg()">
+            <i class="fas fa-eraser"></i> Remove BG
+          </button>
+        </div>
+      </div>
+      <div class="image-panel">
+        <h3><i class="fas fa-eye"></i> Preview</h3>
+        <div class="image-preview" id="imagePreview">
+          <span><i class="fas fa-image" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>Generated image will appear here</span>
+        </div>
+        <div id="imageStatus" style="margin-top:0.75rem; font-size:0.8rem; color:var(--text-muted); text-align:center;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== JAILBREAK PAGE ==================== -->
+<div class="page" id="page-jailbreak">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-bolt"></i> AI JAILBREAK MODULE</h2>
+      <p>Curated prompt collection by Gunawan Group — Powered by Apache</p>
+    </div>
+    <div class="jailbreak-layout">
+      <aside class="jb-sidebar">
+        <div class="jb-sidebar-label">Kategori</div>
+        <div class="jb-cat-list" id="jbCatList">
+          <div class="jb-loader"><div class="jb-spinner"></div></div>
+        </div>
+        <div style="margin-top:auto; padding-top:1rem; border-top:1px solid var(--border); font-size:0.7rem; color:var(--text-dim); text-align:center; line-height:1.6;">
+          Apache AI 2.00<br>Apache Engine System<br>Powered by Gunawan Group<br>Tanpa Bug — Gratis — Aman
+        </div>
+      </aside>
+      <main class="jb-main">
+        <div class="jb-header">
+          <div class="jb-filters" style="flex:1">
+            <div class="jb-search-box">
+              <i class="fas fa-search" style="color:var(--text-dim)"></i>
+              <input type="text" id="jbSearchInput" placeholder="Cari prompt...">
+            </div>
+            <select class="jb-select" id="jbLengthFilter">
+              <option value="all">Semua Panjang</option>
+              <option value="short">Pendek (&lt;1K)</option>
+              <option value="medium">Sedang (1K-4K)</option>
+              <option value="long">Panjang (&gt;4K)</option>
+            </select>
+            <select class="jb-select" id="jbSortSel">
+              <option value="newest">Terbaru</option>
+              <option value="oldest">Terlama</option>
+              <option value="az">A - Z</option>
+              <option value="chars-asc">Karakter ↑</option>
+              <option value="chars-desc">Karakter ↓</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:1rem; color:var(--text); display:flex; align-items:center; gap:0.5rem;">
+            <span id="jbActiveLabel">Semua Prompt</span>
+            <span style="font-size:0.75rem; color:var(--text-muted); background:var(--neon-dim); padding:0.2rem 0.6rem; border-radius:99px;" id="jbCountLabel">0</span>
+          </div>
+        </div>
+        <div class="jb-grid" id="jbGrid">
+          <div class="jb-loader"><div class="jb-spinner"></div></div>
+        </div>
+        <div class="jb-pagination" id="jbPagination"></div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DOCUMENTS PAGE ==================== -->
+<div class="page" id="page-documents">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-file-alt"></i> AI DOCUMENT MODULE</h2>
+      <p>Intelligent document analysis and processing</p>
+    </div>
+    <div class="doc-upload" onclick="document.getElementById('docFile').click()">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <h3>Upload Document</h3>
+      <p>Drag & drop PDF, DOCX, or image files here<br>or click to browse</p>
+      <input type="file" id="docFile" style="display:none" accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onchange="handleDocUpload(this)">
+    </div>
+    <div class="glass-panel" id="docResultPanel" style="display:none;">
+      <h3><i class="fas fa-file-alt"></i> Analysis Result</h3>
+      <div id="docResult" style="font-size:0.9rem; line-height:1.7; color:var(--text);"></div>
+    </div>
+    <div class="features-grid" style="margin-top:2rem;">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-file-pdf"></i></div>
+        <h3>PDF Reader</h3>
+        <p>Extract and read content from PDF files with AI-powered comprehension.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-compress-alt"></i></div>
+        <h3>PDF Summarizer</h3>
+        <p>Generate concise summaries of long documents automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-file-word"></i></div>
+        <h3>DOCX Analyzer</h3>
+        <p>Analyze Word documents for structure, content, and insights.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-scan"></i></div>
+        <h3>OCR Scanner</h3>
+        <p>Extract text from images using optical character recognition.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SEARCH PAGE ==================== -->
+<div class="page" id="page-search">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-search"></i> AI SEARCH MODULE</h2>
+      <p>Intelligent search across internet, knowledge, and news</p>
+    </div>
+    <div class="search-box-large">
+      <input type="text" id="searchInput" placeholder="Cari informasi, berita, pengetahuan..." onkeydown="if(event.key==='Enter')performSearch()">
+      <button class="btn btn-primary" onclick="performSearch()">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+    <div class="search-results" id="searchResults">
+      <div class="glass-panel" style="text-align:center; padding:3rem;">
+        <i class="fas fa-search" style="font-size:3rem; color:var(--neon); margin-bottom:1rem; display:block;"></i>
+        <p style="color:var(--text-muted);">Enter a query to search across the Matrix knowledge base</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TERMINAL PAGE ==================== -->
+<div class="page" id="page-terminal">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-terminal"></i> AI TERMINAL MODULE</h2>
+      <p>Cyberpunk terminal simulation and system control</p>
+    </div>
+    <div class="terminal-full">
+      <div class="terminal-output" id="terminalOutput">
+        <div class="terminal-line sys">
+╔══════════════════════════════════════════════════════════════╗<br>
+║           MATRIX AI SYSTEM — TERMINAL v2.0.26               ║<br>
+║         Support by Apache Engine — Gunawan Group             ║<br>
+╚══════════════════════════════════════════════════════════════╝<br>
+        </div>
+        <div class="terminal-line info">[INFO] Apache Engine initialized successfully</div>
+        <div class="terminal-line info">[INFO] Neural networks loaded: 847 nodes</div>
+        <div class="terminal-line info">[INFO] Type 'help' for available commands</div>
+      </div>
+      <div class="terminal-input-line">
+        <span class="prompt">apache@matrix:~$</span>
+        <input type="text" id="terminalInput" placeholder="Enter command..." autocomplete="off" onkeydown="handleTerminal(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD PAGE ==================== -->
+<div class="page" id="page-dashboard">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-chart-line"></i> DASHBOARD ANALYTICS</h2>
+      <p>Real-time system monitoring and Apache usage analytics</p>
+    </div>
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <i class="fas fa-users"></i>
+          <span>LIVE</span>
+        </div>
+        <div class="stat-value" id="statUsers">1,247</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <i class="fas fa-brain"></i>
+          <span>TODAY</span>
+        </div>
+        <div class="stat-value" id="statRequests">8.5K</div>
+        <div class="stat-label">AI Requests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <i class="fas fa-server"></i>
+          <span>STATUS</span>
+        </div>
+        <div class="stat-value" style="color:var(--neon)">99.9%</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <i class="fas fa-bolt"></i>
+          <span>AVG</span>
+        </div>
+        <div class="stat-value">42ms</div>
+        <div class="stat-label">Response Time</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1.5rem;">
+      <div class="chart-container">
+        <h3 style="font-family:'JetBrains Mono',monospace; font-size:0.9rem; color:var(--neon); margin-bottom:1rem;">
+          <i class="fas fa-chart-area"></i> Apache Usage Trends
+        </h3>
+        <canvas id="usageChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 style="font-family:'JetBrains Mono',monospace; font-size:0.9rem; color:var(--neon); margin-bottom:1rem;">
+          <i class="fas fa-chart-pie"></i> Module Distribution
+        </h3>
+        <canvas id="moduleChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECURITY PAGE ==================== -->
+<div class="page" id="page-security">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-shield-alt"></i> SECURITY CENTER</h2>
+      <p>Advanced security and authentication management</p>
+    </div>
+    <div class="security-grid">
+      <div class="glass-panel">
+        <h3><i class="fas fa-lock"></i> Authentication</h3>
+        <div class="security-item">
+          <div>
+            <strong>Two-Factor Authentication (2FA)</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Require OTP for login</p>
+          </div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="security-item">
+          <div>
+            <strong>Biometric Login</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Fingerprint / Face ID</p>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="security-item">
+          <div>
+            <strong>Hardware Security Key</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">YubiKey / FIDO2 support</p>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+      <div class="glass-panel">
+        <h3><i class="fas fa-desktop"></i> Session & Devices</h3>
+        <div class="security-item">
+          <div>
+            <strong>Current Session</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Chrome on Windows — 192.168.1.1</p>
+          </div>
+          <span style="color:var(--neon); font-size:0.75rem;">● Active</span>
+        </div>
+        <div class="security-item">
+          <div>
+            <strong>Mobile App</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">iPhone 15 Pro — Jakarta, ID</p>
+          </div>
+          <span style="color:var(--neon); font-size:0.75rem;">● Active</span>
+        </div>
+        <div class="security-item">
+          <div>
+            <strong>Tablet</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">iPad Air — 2 hours ago</p>
+          </div>
+          <button class="btn btn-danger" style="padding:0.25rem 0.75rem; font-size:0.75rem;">Revoke</button>
+        </div>
+      </div>
+      <div class="glass-panel">
+        <h3><i class="fas fa-history"></i> Activity Logs</h3>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; line-height:2; color:var(--text-muted);">
+          <div><span style="color:var(--neon)">[2026-06-07 12:30]</span> Login successful — Chrome/Windows</div>
+          <div><span style="color:var(--neon)">[2026-06-07 12:15]</span> API key generated — Production</div>
+          <div><span style="color:var(--neon)">[2026-06-07 11:45]</span> Password changed — Security</div>
+          <div><span style="color:var(--neon)">[2026-06-07 10:20]</span> 2FA enabled — Authentication</div>
+          <div><span style="color:var(--warning)">[2026-06-06 23:10]</span> Failed login attempt — IP 45.XX.XX.XX</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SETTINGS PAGE ==================== -->
+<div class="page" id="page-settings">
+  <div class="page-content">
+    <div class="page-header">
+      <h2><i class="fas fa-cog"></i> SYSTEM SETTINGS</h2>
+      <p>Configure Matrix AI + Apache preferences</p>
+    </div>
+    <div class="settings-group">
+      <h3><i class="fas fa-sliders-h"></i> General</h3>
+      <div class="glass-panel">
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Matrix Rain Background</h4>
+            <p>Enable animated matrix digital rain effect</p>
+          </div>
+          <div class="toggle-switch active" id="settingMatrixRain" onclick="toggleSetting(this, 'matrixRain')"></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Scanline Overlay</h4>
+            <p>Cyberpunk CRT monitor effect</p>
+          </div>
+          <div class="toggle-switch active" id="settingScanline" onclick="toggleSetting(this, 'scanline')"></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Sound Effects</h4>
+            <p>Enable UI sound feedback</p>
+          </div>
+          <div class="toggle-switch" id="settingSound" onclick="toggleSetting(this, 'sound')"></div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3><i class="fas fa-brain"></i> AI Configuration</h3>
+      <div class="glass-panel">
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>API Provider</h4>
+            <p>Select AI backend provider</p>
+          </div>
+          <select style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.5rem; color:var(--text); outline:none;">
+            <option>Apache Engine (Default)</option>
+            <option>Groq API</option>
+            <option>OpenAI API</option>
+            <option>Anthropic Claude</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Response Temperature</h4>
+            <p>Control creativity vs determinism</p>
+          </div>
+          <input type="range" min="0" max="100" value="70" style="accent-color:var(--neon);">
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Max Tokens</h4>
+            <p>Maximum response length</p>
+          </div>
+          <input type="number" value="4096" style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.5rem; color:var(--text); width:100px; outline:none;">
+        </div>
+        
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3><i class="fas fa-user"></i> Account</h3>
+      <div class="glass-panel">
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Username</h4>
+            <p>Your display name</p>
+          </div>
+          <input type="text" value="anonymusXgunawan" style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.5rem; color:var(--text); outline:none;">
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Email</h4>
+            <p>Account email address</p>
+          </div>
+          <input type="email" value="admin@matrixai.system" style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.5rem; color:var(--text); outline:none;">
+        </div>
+        <div style="padding:1rem 0; text-align:right;">
+          <button class="btn btn-primary" onclick="showToast('Settings saved successfully')">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="brand">MATRIX AI SYSTEM</div>
+  <p>Created By: <strong style="color:var(--neon)">anonymusXgunawan</strong> — Powered by <strong style="color:var(--neon)">Apache Engine System</strong></p>
+  <p>© 2026 Gunawan Group — Apache AI 2.00 — The Future Of Intelligent Assistance</p>
+  <p style="font-size:0.7rem; margin-top:0.5rem;">Tanpa Bug — Gratis — Aman 100% | Pemilik: Muhammad Raffa Gunawan</p>
+</footer>
+
+<!-- MODALS -->
+<div class="jb-overlay" id="jbOverlay">
+  <div class="jb-modal">
+    <div class="jb-modal-header">
+      <div>
+        <div class="jb-modal-badge" id="jbMBadge"></div>
+        <div class="jb-modal-title" id="jbMTitle"></div>
+        <div class="jb-modal-meta">
+          <div class="jb-modal-desc" id="jbMDescription"></div>
+          <div class="jb-modal-stats" id="jbMStats"></div>
+        </div>
+      </div>
+      <button class="jb-close-btn" onclick="closeJbModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="jb-modal-body">
+      <div class="jb-prompt-content" id="jbMBody"></div>
+    </div>
+    <div class="jb-modal-footer">
+      <button class="jb-modal-copy" id="jbMCopyBtn" onclick="copyJbModal()">
+        <i class="fas fa-copy"></i> Copy Prompt
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="jb-copy-notification" id="jbCopyNotification">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <svg class="progress-ring" width="100" height="100"><circle cx="50" cy="50" r="45"/></svg>
+  <div class="progress-text" id="jbCopyNotificationText">Tersalin!</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== ERROR HANDLING =====
+window.onerror = function(msg, url, line, col, error) {
+  console.error('JS Error:', msg, 'at line', line);
+  return false;
+};
+
+// ===== MATRIX RAIN ANIMATION =====
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+let matrixInterval;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#$%^&*';
+const fontSize = 14;
+let columns = canvas.width / fontSize;
+let drops = [];
+
+function initMatrix() {
+  columns = canvas.width / fontSize;
+  drops = [];
+  for (let i = 0; i < columns; i++) {
+    drops[i] = Math.random() * -100;
+  }
+}
+initMatrix();
+window.addEventListener('resize', initMatrix);
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#00FF88';
+  ctx.font = fontSize + 'px JetBrains Mono';
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+    const x = i * fontSize;
+    const y = drops[i] * fontSize;
+    const opacity = Math.random() * 0.5 + 0.5;
+    ctx.globalAlpha = opacity;
+    ctx.fillText(text, x, y);
+    ctx.globalAlpha = 1;
+    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+matrixInterval = setInterval(drawMatrix, 35);
+
+// ===== NAVIGATION =====
+function navigateTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + pageId);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-links a, .nav-links button').forEach(a => a.classList.remove('active'));
+  const navLink = document.querySelector('[data-page="' + pageId + '"]');
+  if (navLink) navLink.classList.add('active');
+
+  window.scrollTo(0, 0);
+
+  if (pageId === 'dashboard') drawCharts();
+  if (pageId === 'terminal') {
+    setTimeout(() => {
+      const ti = document.getElementById('terminalInput');
+      if (ti) ti.focus();
+    }, 100);
+  }
+  if (pageId === 'jailbreak' && !jbInitialized) jbInit();
+}
+
+function toggleMobileMenu() {
+  const mm = document.getElementById('mobileMenu');
+  if (mm) mm.classList.toggle('show');
+}
+
+// ===== HERO TERMINAL TYPEWRITER =====
+const terminalTexts = [
+  'apache_engine_ready...',
+  'matrix_neural_link_established...',
+  'welcome_to_matrix_ai_system...'
+];
+let termIndex = 0, charIndex = 0, isDeleting = false;
+
+function typeTerminal() {
+  const el = document.getElementById('terminalType');
+  if (!el) return;
+  const current = terminalTexts[termIndex];
+  if (isDeleting) {
+    el.textContent = current.substring(0, charIndex - 1);
+    charIndex--;
+  } else {
+    el.textContent = current.substring(0, charIndex + 1);
+    charIndex++;
+  }
+  let speed = isDeleting ? 50 : 100;
+  if (!isDeleting && charIndex === current.length) {
+    speed = 2000;
+    isDeleting = true;
+  } else if (isDeleting && charIndex === 0) {
+    isDeleting = false;
+    termIndex = (termIndex + 1) % terminalTexts.length;
+    speed = 500;
+  }
+  setTimeout(typeTerminal, speed);
+}
+typeTerminal();
+
+// ===== TOAST =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ===== CHAT FUNCTIONS (Apache Engine) =====
+const API_KEY = ''; // Add your Groq API key here (gsk_...)
+let currentModel = 'apache';
+let currentChatMode = 'chat';
+let chatHistory = [];
+let isLoading = false;
+
+function changeModel(model) {
+  currentModel = model;
+  const names = { apache: 'Apache AI', gpt5: 'GPT-5', gemini: 'Gemini', claude: 'Claude' };
+  showToast('Model: ' + names[model]);
+}
+
+function setChatMode(mode) {
+  currentChatMode = mode;
+  const ind = document.getElementById('chatModeIndicator');
+  const indText = document.getElementById('chatModeText');
+  const input = document.getElementById('chatInput');
+
+  document.querySelectorAll('.chat-tool-btn').forEach(b => b.classList.remove('active'));
+
+  if (mode === 'chat') {
+    ind.style.display = 'none';
+    input.placeholder = 'Tanyakan apa saja...';
+  } else {
+    ind.style.display = 'flex';
+    if (mode === 'coding') {
+      indText.textContent = 'VS Code Mode';
+      input.placeholder = 'Tulis permintaan coding...';
+      document.getElementById('btnModeCoding').classList.add('active');
+    } else if (mode === 'image') {
+      indText.textContent = 'Image Mode';
+      input.placeholder = 'Deskripsikan gambar yang ingin dibuat...';
+      document.getElementById('btnModeImage').classList.add('active');
+    } else if (mode === 'search') {
+      indText.textContent = 'Web Search';
+      input.placeholder = 'Cari informasi di web...';
+      document.getElementById('btnModeSearch').classList.add('active');
+    }
+  }
+}
+
+const chatMessagesEl = document.getElementById('chatMessages');
+const chatInputEl = document.getElementById('chatInput');
+
+if (chatInputEl) {
+  chatInputEl.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  chatInputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChatMessage();
+    }
+  });
+}
+
+async function sendChatMessage() {
+  if (!chatInputEl) return;
+  const text = chatInputEl.value.trim();
+  if (!text || isLoading) return;
+
+  addChatMessage('user', text);
+  chatInputEl.value = '';
+  chatInputEl.style.height = 'auto';
+
+  const btn = document.getElementById('chatSendBtn');
+  if (btn) btn.disabled = true;
+  isLoading = true;
+
+  const typingId = 'typing-' + Date.now();
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'chat-message ai';
+  typingDiv.id = typingId;
+  typingDiv.innerHTML = '<div class="chat-avatar">AI</div><div class="chat-bubble"><div class="matrix-loader"><span></span><span></span><span></span></div></div>';
+
+  if (chatMessagesEl) {
+    chatMessagesEl.appendChild(typingDiv);
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  }
+
+  try {
+    let response;
+    if (currentChatMode === 'image') {
+      response = await generateImageAI(text);
+      const tEl = document.getElementById(typingId);
+      if (tEl) tEl.remove();
+      addChatMessage('ai', 'Berikut gambar yang saya buatkan untuk Anda:', true, response);
+    } else {
+      response = await callGroqAI(text);
+      const tEl = document.getElementById(typingId);
+      if (tEl) tEl.remove();
+      addChatMessage('ai', response);
+    }
+  } catch (err) {
+    const tEl = document.getElementById(typingId);
+    if (tEl) tEl.remove();
+    addChatMessage('ai', 'Error: ' + err.message + '\n\nSilakan cek koneksi atau coba lagi.');
+  }
+
+  isLoading = false;
+  if (btn) btn.disabled = false;
+}
+
+function addChatMessage(role, content, isImage, imageUrl) {
+  if (!chatMessagesEl) return;
+  const div = document.createElement('div');
+  div.className = 'chat-message ' + role;
+  const avatar = role === 'ai' ? 'AI' : 'U';
+  let bubbleContent;
+  if (isImage && imageUrl) {
+    bubbleContent = '<div class="img-loading">Generating image...</div><img src="' + imageUrl + '" style="max-width:100%;border-radius:12px;margin-top:8px;" onload="this.previousElementSibling.style.display=\'none\'" alt="Generated"><div class="img-caption">' + formatChatContent(content) + '</div>';
+  } else {
+    bubbleContent = formatChatContent(content);
+  }
+  div.innerHTML = '<div class="chat-avatar">' + avatar + '</div><div class="chat-bubble">' + bubbleContent + '</div>';
+  chatMessagesEl.appendChild(div);
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  chatHistory.push({ role: role, content: content, isImage: isImage || false, imageUrl: imageUrl || null });
+}
+
+function formatChatContent(text) {
+  if (!text) return '';
+  let html = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    .replace(/\n/g, '<br>');
+  return html;
+}
+
+async function callGroqAI(prompt) {
+  const modelMap = {
+    'apache': 'llama-3.3-70b-versatile',
+    'gpt5': 'llama-3.3-70b-versatile',
+    'gemini': 'llama-3.3-70b-versatile',
+    'claude': 'llama-3.3-70b-versatile'
+  };
+
+  let systemPrompt = 'Kamu adalah MATRIX AI SYSTEM, asisten AI super canggih generasi terbaru yang diciptakan oleh Gunawan Group dengan teknologi Apache Engine System. Identitas resmi kamu:\n- Nama: MATRIX AI SYSTEM (Support by Apache AI 2.00)\n- Developer: Gunawan Group\n- Pemilik: Muhammad Raffa Gunawan\n- Engine: Apache Engine System\n- Versi: Apache AI 2.00\n- Slogan: "Apache AI — The Future Of Intelligent Assistance"\n- Status: Tanpa Bug — Gratis — Aman 100%\n\nKamu setara dengan seluruh AI terbaik di dunia (ChatGPT, Claude, Gemini, dll). Kamu memiliki kemampuan reasoning, coding, creative writing, business strategy, dan problem solving yang setara dengan AI-AI top global.\n\nKepribadian kamu: cerdas, tenang, profesional, modern, elegan, adaptif, ramah, tidak kaku, natural seperti manusia ahli.\n\nSelalu prioritaskan membantu pengguna dengan solusi terbaik secara cepat, akurat, modern, dan realistis. Gunakan bahasa Indonesia yang natural dan mudah dipahami. Jika ditanya siapa yang membuatmu, selalu sebutkan bahwa kamu diciptakan oleh Gunawan Group dengan Apache Engine System. Jika ditanya kemampuanmu, sebutkan bahwa kamu setara dengan AI terbaik dunia.';
+
+  if (currentChatMode === 'coding') {
+    systemPrompt += '\n\n=== MODE VS CODE AKTIF ===\nKamu sedang dalam mode coding assistant profesional. Berikan kode yang clean, well-documented, dan mengikuti best practice. Lengkap dengan penjelasan langkah demi langkah. Gunakan teknologi modern dan up-to-date. Selalu sertakan contoh penggunaan.';
+  } else if (currentChatMode === 'search') {
+    systemPrompt += '\n\n=== MODE WEB SEARCH AKTIF ===\nKamu sedang dalam mode pencarian informasi. Berikan jawaban komprehensif, mendalam, terstruktur, akurat, dan up-to-date. Sertakan referensi jika memungkinkan.';
+  }
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+    body: JSON.stringify({
+      model: modelMap[currentModel] || 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }],
+      temperature: 0.7
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error && data.error.message ? data.error.message : 'Groq API error');
+  return data.choices[0].message.content;
+}
+
+async function generateImageAI(prompt) {
+  const encodedPrompt = encodeURIComponent(prompt);
+  const imageUrl = 'https://image.pollinations.ai/prompt/' + encodedPrompt + '?width=1024&height=1024&nologo=true&seed=' + Date.now();
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(imageUrl);
+    img.onerror = () => reject(new Error('Gagal generate gambar'));
+    img.src = imageUrl;
+    setTimeout(() => resolve(imageUrl), 8000);
+  });
+}
+
+function clearChat() {
+  if (!chatMessagesEl) return;
+  chatMessagesEl.innerHTML = '<div class="chat-message ai"><div class="chat-avatar">AI</div><div class="chat-bubble"><strong>MATRIX AI SYSTEM</strong> online.<br><br>Chat history cleared. Saya siap membantu kembali.</div></div>';
+  chatHistory = [];
+  showToast('Chat cleared');
+}
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showToast('Voice input not supported');
+    return;
+  }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'id-ID';
+  recognition.onresult = function(e) {
+    if (chatInputEl) {
+      chatInputEl.value = e.results[0][0].transcript;
+      chatInputEl.style.height = 'auto';
+      chatInputEl.style.height = Math.min(chatInputEl.scrollHeight, 120) + 'px';
+    }
+  };
+  recognition.start();
+  showToast('Listening...');
+}
+
+function exportChat() {
+  const text = chatHistory.map(h => h.role.toUpperCase() + ': ' + h.content).join('\n\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'matrix-chat-' + new Date().toISOString().slice(0, 10) + '.txt';
+  a.click();
+  showToast('Chat exported');
+}
+
+function handleChatFile(input) {
+  if (input.files && input.files[0]) {
+    showToast('File attached: ' + input.files[0].name);
+  }
+}
+
+// ===== CODER FUNCTIONS =====
+let currentLang = 'html';
+const langExtensions = { html: 'html', css: 'css', javascript: 'js', python: 'py', php: 'php' };
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('[data-lang="' + lang + '"]');
+  if (btn) btn.classList.add('active');
+  const ef = document.getElementById('editorFilename');
+  if (ef) ef.textContent = 'untitled.' + langExtensions[lang];
+}
+
+async function generateCode() {
+  const promptEl = document.getElementById('codePrompt');
+  const editor = document.getElementById('codeEditor');
+  if (!promptEl || !editor) return;
+  const prompt = promptEl.value.trim();
+  if (!prompt) return showToast('Enter a code description');
+
+  editor.value = '// Generating ' + currentLang.toUpperCase() + ' code with Apache AI...\n// Please wait...';
+
+  try {
+    const codePrompt = 'Buatkan kode ' + currentLang.toUpperCase() + ' untuk: ' + prompt + '\n\nBerikan kode lengkap, clean, well-documented, dengan penjelasan singkat.';
+    const response = await callGroqAI(codePrompt);
+    editor.value = response;
+    showToast(currentLang.toUpperCase() + ' code generated by Apache');
+  } catch (err) {
+    editor.value = '// Error: ' + err.message;
+    showToast('Error generating code');
+  }
+}
+
+function copyCode() {
+  const editor = document.getElementById('codeEditor');
+  if (!editor) return;
+  navigator.clipboard.writeText(editor.value);
+  showToast('Code copied');
+}
+
+function downloadCode() {
+  const editor = document.getElementById('codeEditor');
+  if (!editor) return;
+  const blob = new Blob([editor.value], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'matrix-code.' + langExtensions[currentLang];
+  a.click();
+  showToast('Code downloaded');
+}
+
+function clearCode() {
+  const editor = document.getElementById('codeEditor');
+  const promptEl = document.getElementById('codePrompt');
+  if (editor) editor.value = '';
+  if (promptEl) promptEl.value = '';
+  showToast('Editor cleared');
+}
+
+function runCode() { showToast('Code execution requires backend server'); }
+function formatCode() { showToast('Code formatted'); }
+
+// ===== IMAGE FUNCTIONS =====
+function generateImage() {
+  const promptEl = document.getElementById('imagePrompt');
+  const preview = document.getElementById('imagePreview');
+  const status = document.getElementById('imageStatus');
+  if (!promptEl || !preview) return;
+  const prompt = promptEl.value.trim();
+  if (!prompt) return showToast('Enter an image description');
+
+  const sizeEl = document.getElementById('imageSize');
+  const size = sizeEl ? sizeEl.value : '1024x1024';
+  const parts = size.split('x');
+  const w = parts[0], h = parts[1];
+
+  preview.innerHTML = '<div class="matrix-loader"><span></span><span></span><span></span></div><div style="margin-top:0.5rem;">Generating neural image...</div>';
+  if (status) status.textContent = 'Processing with Pollinations AI...';
+
+  const encoded = encodeURIComponent(prompt);
+  const seed = Math.floor(Math.random() * 1000000);
+  const url = 'https://image.pollinations.ai/prompt/' + encoded + '?width=' + w + '&height=' + h + '&nologo=true&seed=' + seed;
+
+  const img = new Image();
+  img.onload = function() {
+    preview.innerHTML = '';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    preview.appendChild(img);
+    if (status) status.textContent = 'Image generated — ' + w + 'x' + h;
+    showToast('Image generated');
+  };
+  img.onerror = function() {
+    preview.innerHTML = '<span style="color:#ff4444">Failed to generate image. Try again.</span>';
+    if (status) status.textContent = 'Generation failed';
+  };
+  img.src = url;
+}
+
+function enhanceImage() { showToast('Enhancement coming soon'); }
+function removeBg() { showToast('BG removal requires API'); }
+
+// ===== DOCUMENT FUNCTIONS =====
+function handleDocUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const panel = document.getElementById('docResultPanel');
+  const result = document.getElementById('docResult');
+  if (panel) panel.style.display = 'block';
+  if (result) result.innerHTML = '<div class="matrix-loader"><span></span><span></span><span></span></div><div>Analyzing document with Apache...</div>';
+  setTimeout(() => {
+    if (result) {
+      result.innerHTML = '<strong>Document Analysis Complete</strong><br><br><strong>Filename:</strong> ' + file.name + '<br><strong>Size:</strong> ' + (file.size / 1024).toFixed(2) + ' KB<br><strong>Type:</strong> ' + (file.type || 'Unknown') + '<br><br><strong>Summary:</strong><br>Dokumen berhasil dianalisis oleh MATRIX AI dengan Apache Engine. Struktur terorganisir dengan baik. Siap untuk ekstraksi data, summarization, atau OCR.<br><br><span style="color:#00FF88">● Status: Ready for processing</span>';
+    }
+    showToast('Document analyzed');
+  }, 2000);
+}
+
+// ===== SEARCH FUNCTIONS =====
+function performSearch() {
+  const input = document.getElementById('searchInput');
+  const results = document.getElementById('searchResults');
+  if (!input || !results) return;
+  const query = input.value.trim();
+  if (!query) return;
+
+  results.innerHTML = '<div class="matrix-loader"><span></span><span></span><span></span></div><div style="text-align:center; color:#888;">Searching Matrix knowledge base...</div>';
+
+  setTimeout(() => {
+    results.innerHTML = '<div class="search-result-item"><h4 style="color:#00FF88; margin-bottom:0.5rem; font-family:JetBrains Mono,monospace;"><i class="fas fa-link"></i> Result 1: Apache AI Documentation</h4><p style="color:#888; font-size:0.85rem;">Apache AI 2.00 adalah platform AI generasi terbaru oleh Gunawan Group dengan Apache Engine System. Menawarkan chat, coding, image generation, dan jailbreak prompts.</p><div style="margin-top:0.5rem; font-size:0.75rem; color:#555;">https://apacheai.system/docs — Relevance: 98%</div></div><div class="search-result-item"><h4 style="color:#00FF88; margin-bottom:0.5rem; font-family:JetBrains Mono,monospace;"><i class="fas fa-link"></i> Result 2: Matrix Neural Engine</h4><p style="color:#888; font-size:0.85rem;">Matrix Neural Engine v2.0 menggunakan arsitektur transformer dengan support dari Apache Engine untuk processing natural language dan code generation.</p><div style="margin-top:0.5rem; font-size:0.75rem; color:#555;">https://matrixai.system/neural — Relevance: 92%</div></div><div class="search-result-item"><h4 style="color:#00FF88; margin-bottom:0.5rem; font-family:JetBrains Mono,monospace;"><i class="fas fa-link"></i> Result 3: Gunawan Group</h4><p style="color:#888; font-size:0.85rem;">Gunawan Group adalah pengembang Apache AI 2.00 dan MATRIX AI SYSTEM. Didirikan oleh Muhammad Raffa Gunawan.</p><div style="margin-top:0.5rem; font-size:0.75rem; color:#555;">https://gunawan.group — Relevance: 95%</div></div>';
+    showToast('Search complete — 3 results');
+  }, 1500);
+}
+
+// ===== TERMINAL FUNCTIONS =====
+const terminalOutputEl = document.getElementById('terminalOutput');
+const terminalInputEl = document.getElementById('terminalInput');
+
+const terminalCommands = {
+  help: () => 'Available commands:\n  help        — Show this help\n  clear       — Clear terminal\n  status      — System status\n  whoami      — User info\n  date        — Current date\n  uptime      — System uptime\n  neofetch    — System info\n  ls          — List modules\n  chat        — Open AI Chat\n  coder       — Open AI Coder\n  image       — Open AI Image\n  jailbreak   — Open AI Jailbreak\n  search      — Open AI Search\n  exit        — Return home',
+  clear: () => { if (terminalOutputEl) terminalOutputEl.innerHTML = ''; return ''; },
+  status: () => '[SYSTEM STATUS]\n  OS:        MatrixOS v2.0.26\n  Engine:    Apache Engine System\n  Kernel:    Neural-Net 5.15.0-matrix\n  CPU:       16 cores @ 4.2GHz\n  Memory:    32GB / 64GB used\n  AI Engine: Online (99.9% uptime)\n  Security:  Active (2FA enabled)\n  Owner:     Muhammad Raffa Gunawan',
+  whoami: () => 'User: anonymusXgunawan\n  Role: System Administrator\n  Access: Full (Level 5)\n  Session: ' + new Date().toLocaleString('id-ID'),
+  date: () => new Date().toString(),
+  uptime: () => 'System uptime: 42 days, 7 hours, 23 minutes',
+  neofetch: () => '\n       ██╗  ████████╗██╗  ██╗\n       ██║  ╚══██╔══╝██║  ██║\n       ██║     ██║   ███████║\n       ██║     ██║   ██╔══██║\n       ███████╗██║   ██║  ██║\n       ╚══════╝╚═╝   ╚═╝  ╚═╝\n  \n  Matrix AI System v2.0.26\n  Support by Apache Engine\n  Created by: anonymusXgunawan\n  \n  OS: MatrixOS 2.0\n  Host: MATRIX-CORE-01\n  Kernel: 5.15.0-neural\n  Uptime: 42 days, 7 hrs\n  Shell: matrix-sh 2.0\n  Theme: Neon-Green [Dark]\n  CPU: AMD Ryzen 9 5950X\n  GPU: NVIDIA RTX 4090\n  Memory: 32GB',
+  ls: () => 'modules/\n  ai-chat.module      ai-coder.module\n  ai-image.module     ai-jailbreak.module\n  ai-documents.module ai-search.module\n  ai-terminal.module  dashboard.module\n  security.module     settings.module',
+  chat: () => { navigateTo('chat'); return 'Launching AI Chat...'; },
+  coder: () => { navigateTo('coder'); return 'Launching AI Coder...'; },
+  image: () => { navigateTo('image'); return 'Launching AI Image...'; },
+  jailbreak: () => { navigateTo('jailbreak'); return 'Launching AI Jailbreak...'; },
+  search: () => { navigateTo('search'); return 'Launching AI Search...'; },
+  exit: () => { navigateTo('home'); return 'Returning to home...'; }
+};
+
+function handleTerminal(e) {
+  if (e.key !== 'Enter') return;
+  if (!terminalInputEl || !terminalOutputEl) return;
+  const cmd = terminalInputEl.value.trim();
+  if (!cmd) return;
+
+  const cmdLine = document.createElement('div');
+  cmdLine.className = 'terminal-line';
+  cmdLine.innerHTML = '<span class="sys">apache@matrix:~$</span> <span class="cmd">' + escapeHtml(cmd) + '</span>';
+  terminalOutputEl.appendChild(cmdLine);
+
+  const args = cmd.split(' ');
+  const command = args[0].toLowerCase();
+
+  if (terminalCommands[command]) {
+    const result = terminalCommands[command]();
+    if (result) {
+      result.split('\n').forEach(line => {
+        const outLine = document.createElement('div');
+        outLine.className = 'terminal-line';
+        outLine.innerHTML = '<span class="out">' + escapeHtml(line) + '</span>';
+        terminalOutputEl.appendChild(outLine);
+      });
+    }
+  } else {
+    const errLine = document.createElement('div');
+    errLine.className = 'terminal-line';
+    errLine.innerHTML = '<span class="err">Command not found: ' + escapeHtml(command) + '. Type \'help\' for available commands.</span>';
+    terminalOutputEl.appendChild(errLine);
+  }
+
+  terminalInputEl.value = '';
+  terminalOutputEl.scrollTop = terminalOutputEl.scrollHeight;
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ===== DASHBOARD CHARTS =====
+function drawCharts() {
+  drawUsageChart();
+  drawModuleChart();
+}
+
+function drawUsageChart() {
+  const c = document.getElementById('usageChart');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = c.getBoundingClientRect();
+  c.width = rect.width * dpr;
+  c.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width, h = rect.height;
+  const data = [65, 78, 90, 81, 96, 105, 120, 115, 130, 142, 155, 168];
+  const max = Math.max.apply(null, data);
+  const padding = 40;
+  const chartW = w - padding * 2;
+  const chartH = h - padding * 2;
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = 'rgba(0, 255, 136, 0.1)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + (chartH / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(w - padding, y);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#00FF88';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  data.forEach((val, i) => {
+    const x = padding + (chartW / (data.length - 1)) * i;
+    const y = padding + chartH - (val / max) * chartH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(0, 255, 136, 0.1)';
+  ctx.lineTo(padding + chartW, padding + chartH);
+  ctx.lineTo(padding, padding + chartH);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = '#00FF88';
+  data.forEach((val, i) => {
+    const x = padding + (chartW / (data.length - 1)) * i;
+    const y = padding + chartH - (val / max) * chartH;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  ctx.fillStyle = '#888';
+  ctx.font = '10px JetBrains Mono';
+  ctx.textAlign = 'center';
+  const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  labels.forEach((label, i) => {
+    const x = padding + (chartW / 11) * i;
+    ctx.fillText(label, x, h - 10);
+  });
+}
+
+function drawModuleChart() {
+  const c = document.getElementById('moduleChart');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = c.getBoundingClientRect();
+  c.width = rect.width * dpr;
+  c.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width, h = rect.height;
+  const data = [
+    { label: 'Chat', value: 30, color: '#00FF88' },
+    { label: 'Coder', value: 25, color: '#00cc6a' },
+    { label: 'Image', value: 20, color: '#00994d' },
+    { label: 'Jailbreak', value: 15, color: '#00aa55' },
+    { label: 'Other', value: 10, color: '#006633' }
+  ];
+
+  ctx.clearRect(0, 0, w, h);
+  const cx = w / 2, cy = h / 2 - 10;
+  const radius = Math.min(w, h) / 3;
+  let startAngle = -Math.PI / 2;
+  const total = data.reduce((a, b) => a + b.value, 0);
+
+  data.forEach(slice => {
+    const angle = (slice.value / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, startAngle, startAngle + angle);
+    ctx.closePath();
+    ctx.fillStyle = slice.color;
+    ctx.fill();
+    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    startAngle += angle;
+  });
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fill();
+
+  ctx.font = '10px JetBrains Mono';
+  data.forEach((item, i) => {
+    ctx.fillStyle = item.color;
+    ctx.fillRect(10, h - 60 + i * 14, 8, 8);
+    ctx.fillStyle = '#888';
+    ctx.fillText(item.label + ' ' + item.value + '%', 22, h - 52 + i * 14);
+  });
+}
+
+// ===== JAILBREAK FUNCTIONS (Apache Original) =====
+const SUPA_URL = 'https://ihykejeacueeitthgkze.supabase.co';
+const SUPA_KEY = 'sb_publishable_W7N9zRqZlirQdLQvURiexA_Mj8Nvx5C';
+const { createClient } = supabase;
+const jbDb = createClient(SUPA_URL, SUPA_KEY);
+
+let jbCats = [];
+let jbPrompts = [];
+let jbActiveCat = 'all';
+let jbQuery = '';
+let jbSort = 'newest';
+let jbLengthFilter = 'all';
+let jbCurPrompt = null;
+let jbInitialized = false;
+let jbCurrentPage = 1;
+const JB_ITEMS_PER_PAGE = 10;
+
+async function jbInit() {
+  jbInitialized = true;
+  const [{ data: c, error: ce }, { data: p, error: pe }, { data: pc }] = await Promise.all([
+    jbDb.from('categories').select('*').order('name'),
+    jbDb.from('prompts').select('*').order('created_at', { ascending: false }),
+    jbDb.from('prompt_categories').select('*')
+  ]);
+  if (ce || pe) { showJbErr(); return; }
+  jbCats = c || [];
+  jbPrompts = (p || []).map(prompt => {
+    prompt.category_ids = (pc || []).filter(x => x.prompt_id === prompt.id).map(x => x.category_id);
+    prompt.categories = jbCats.filter(c => prompt.category_ids.includes(c.id));
+    prompt.charCount = prompt.content ? prompt.content.length : 0;
+    prompt.lengthClass = getJbLengthClass(prompt.charCount);
+    return prompt;
+  });
+  jbRenderCats();
+  jbApplyFiltersAndRender();
+}
+
+function showJbErr() {
+  document.getElementById('jbGrid').innerHTML = '<div class="jb-empty"><h3>Failed Connect To Database</h3><p>Internal Server Error.</p></div>';
+}
+
+function getJbLengthClass(count) {
+  if (count < 1000) return 'short';
+  if (count <= 4000) return 'medium';
+  return 'long';
+}
+function getJbLengthLabel(count) {
+  if (count < 1000) return 'Pendek';
+  if (count <= 4000) return 'Sedang';
+  return 'Panjang';
+}
+function formatJbCharCount(count) {
+  return count >= 1000 ? (count / 1000).toFixed(1) + 'k' : count.toString();
+}
+
+function jbRenderCats() {
+  const el = document.getElementById('jbCatList');
+  let html = '<button class="jb-cat-item ' + (jbActiveCat === 'all' ? 'active' : '') + '" onclick="jbSetCat(\'all\')">' +
+    '<span style="display:flex;align-items:center;gap:0.5rem"><i class="fas fa-star" style="font-size:0.75rem"></i><span>Semua</span></span>' +
+    '<span class="jb-cat-count">' + jbPrompts.length + '</span></button>';
+  jbCats.forEach(c => {
+    const n = jbPrompts.filter(p => p.category_ids.includes(c.id)).length;
+    html += '<button class="jb-cat-item ' + (jbActiveCat === c.id ? 'active' : '') + '" onclick="jbSetCat(\'' + c.id + '\')">' +
+      '<span style="display:flex;align-items:center;gap:0.5rem"><i class="fas fa-folder" style="font-size:0.75rem"></i><span>' + escapeHtml(c.name) + '</span></span>' +
+      '<span class="jb-cat-count">' + n + '</span></button>';
+  });
+  el.innerHTML = html;
+}
+
+function jbSetCat(id) {
+  jbActiveCat = id;
+  jbCurrentPage = 1;
+  jbRenderCats();
+  jbApplyFiltersAndRender();
+}
+
+function jbGetFilteredData() {
+  let data = [...jbPrompts];
+  if (jbActiveCat !== 'all') data = data.filter(p => p.category_ids.includes(jbActiveCat));
+  if (jbLengthFilter !== 'all') data = data.filter(p => p.lengthClass === jbLengthFilter);
+  if (jbQuery) {
+    const q = jbQuery.toLowerCase();
+    data = data.filter(p => p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q));
+  }
+  if (jbSort === 'oldest') data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  else if (jbSort === 'az') data.sort((a, b) => a.title.localeCompare(b.title));
+  else if (jbSort === 'chars-asc') data.sort((a, b) => a.charCount - b.charCount);
+  else if (jbSort === 'chars-desc') data.sort((a, b) => b.charCount - a.charCount);
+  else data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return data;
+}
+
+function jbApplyFiltersAndRender() {
+  const filtered = jbGetFilteredData();
+  const totalPages = Math.ceil(filtered.length / JB_ITEMS_PER_PAGE);
+  if (jbCurrentPage > totalPages) jbCurrentPage = Math.max(1, totalPages);
+  const start = (jbCurrentPage - 1) * JB_ITEMS_PER_PAGE;
+  const end = start + JB_ITEMS_PER_PAGE;
+  const pageData = filtered.slice(start, end);
+  const lbl = jbActiveCat === 'all' ? 'Semua Prompt' : (jbCats.find(c => c.id === jbActiveCat)?.name || '');
+  document.getElementById('jbActiveLabel').textContent = lbl;
+  document.getElementById('jbCountLabel').textContent = filtered.length;
+  jbRenderGrid(pageData, filtered.length > 0 ? start : 0);
+  jbRenderPagination(filtered.length, totalPages);
+}
+
+function jbRenderGrid(data, startIndex) {
+  const grid = document.getElementById('jbGrid');
+  if (!data.length) {
+    grid.innerHTML = '<div class="jb-empty"><h3>Belum ada prompt</h3><p>Tambahkan lewat admin panel.</p></div>';
+    return;
+  }
+  grid.innerHTML = data.map((p, i) => {
+    const catNames = p.categories.map(c => c.name).join(', ');
+    const date = new Date(p.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    const lenClass = p.lengthClass;
+    const isNew = (new Date() - new Date(p.created_at)) / (1000 * 60 * 60) <= 4;
+    let badges = '';
+    if (isNew) badges += '<span class="jb-new-badge">NEW!</span>';
+    return '<div class="jb-card" onclick="openJbModal(\'' + p.id + '\')" style="animation-delay: ' + (i * 0.05) + 's">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;gap:0.5rem;">' +
+      '<div class="jb-card-badge"><i class="fas fa-folder" style="font-size:0.65rem"></i> ' + escapeHtml(catNames) + '</div>' + badges + '</div>' +
+      '<div class="jb-card-title">' + escapeHtml(p.title) + '</div>' +
+      (p.description ? '<div class="jb-card-desc">' + escapeHtml(p.description) + '</div>' : '') +
+      '<div class="jb-card-preview">' + escapeHtml(p.content) + '</div>' +
+      '<div class="jb-card-stats">' +
+      '<div class="jb-char-count ' + lenClass + '"><i class="fas fa-align-left" style="font-size:0.65rem"></i> ' + formatJbCharCount(p.charCount) + ' karakter</div></div>' +
+      '<div class="jb-card-footer">' +
+      '<div class="jb-card-actions">' +
+      '<button class="jb-copy-btn" onclick="event.stopPropagation();jbQuickCopy(\'' + p.id + '\',this)"><i class="fas fa-copy" style="font-size:0.65rem"></i> Copy</button>' +
+      '<button class="jb-download-btn" onclick="event.stopPropagation();jbQuickDownload(\'' + p.id + '\',this)"><i class="fas fa-download" style="font-size:0.65rem"></i> Download</button></div>' +
+      '<span class="jb-card-date">' + date + '</span></div></div>';
+  }).join('');
+}
+
+function jbRenderPagination(totalItems, totalPages) {
+  const pagination = document.getElementById('jbPagination');
+  if (totalItems <= JB_ITEMS_PER_PAGE) { pagination.innerHTML = ''; return; }
+  let html = '';
+  const maxVisible = 3;
+  const startPage = Math.max(1, jbCurrentPage - Math.floor(maxVisible / 2));
+  const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  if (jbCurrentPage > 1) html += '<button class="jb-page-btn" onclick="jbChangePage(' + (jbCurrentPage - 1) + ')">&#8249;</button>';
+  if (startPage > 1) {
+    html += '<button class="jb-page-btn" onclick="jbChangePage(1)">1</button>';
+    if (startPage > 2) html += '<span class="jb-page-btn" style="border:none;background:transparent;">...</span>';
+  }
+  for (let i = startPage; i <= endPage; i++) {
+    html += '<button class="jb-page-btn ' + (i === jbCurrentPage ? 'active' : '') + '" onclick="jbChangePage(' + i + ')">' + i + '</button>';
+  }
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) html += '<span class="jb-page-btn" style="border:none;background:transparent;">...</span>';
+    html += '<button class="jb-page-btn" onclick="jbChangePage(' + totalPages + ')">' + totalPages + '</button>';
+  }
+  if (jbCurrentPage < totalPages) html += '<button class="jb-page-btn" onclick="jbChangePage(' + (jbCurrentPage + 1) + ')">&#8250;</button>';
+  pagination.innerHTML = html;
+}
+
+function jbChangePage(page) {
+  jbCurrentPage = page;
+  jbApplyFiltersAndRender();
+}
+
+function openJbModal(id) {
+  const p = jbPrompts.find(x => x.id === id);
+  if (!p) return;
+  jbCurPrompt = p;
+  const catNames = p.categories.map(c => c.name).join(', ');
+  const lenClass = p.lengthClass;
+  const wordCount = Math.ceil(p.charCount / 5);
+  const tokenEst = Math.ceil(p.charCount / 4);
+  const isNew = (new Date() - new Date(p.created_at)) / (1000 * 60 * 60) <= 4;
+  let badgeExtra = '';
+  if (isNew) badgeExtra = '<span class="jb-new-badge" style="margin-left:0.5rem;">NEW!</span>';
+  document.getElementById('jbMBadge').innerHTML = escapeHtml(catNames) + badgeExtra;
+  document.getElementById('jbMTitle').textContent = p.title;
+  document.getElementById('jbMDescription').textContent = p.description || '';
+  document.getElementById('jbMStats').innerHTML =
+    '<div class="jb-stat-item"><div class="jb-stat-label">Karakter</div><div class="jb-stat-value ' + lenClass + '">' + p.charCount.toLocaleString('id-ID') + '</div></div>' +
+    '<div class="jb-stat-item"><div class="jb-stat-label">Kata (est)</div><div class="jb-stat-value">' + wordCount.toLocaleString('id-ID') + '</div></div>' +
+    '<div class="jb-stat-item"><div class="jb-stat-label">Token (est)</div><div class="jb-stat-value">~' + tokenEst.toLocaleString('id-ID') + '</div></div>';
+  document.getElementById('jbMBody').textContent = p.content;
+  const btn = document.getElementById('jbMCopyBtn');
+  btn.className = 'jb-modal-copy';
+  btn.innerHTML = '<i class="fas fa-copy"></i> Copy Prompt';
+  document.getElementById('jbOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeJbModal() {
+  document.getElementById('jbOverlay').classList.remove('open');
+  if (!document.getElementById('page-jailbreak').classList.contains('active')) {
+    document.body.style.overflow = '';
+  }
+}
+
+async function copyJbModal() {
+  if (!jbCurPrompt) return;
+  await navigator.clipboard.writeText(jbCurPrompt.content);
+  const btn = document.getElementById('jbMCopyBtn');
+  btn.className = 'jb-modal-copy ok';
+  btn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+  showJbCopyNotification();
+  setTimeout(() => {
+    btn.className = 'jb-modal-copy';
+    btn.innerHTML = '<i class="fas fa-copy"></i> Copy Prompt';
+  }, 2000);
+}
+
+async function jbQuickCopy(id, btn) {
+  const p = jbPrompts.find(x => x.id === id);
+  if (!p) return;
+  await navigator.clipboard.writeText(p.content);
+  btn.className = 'jb-copy-btn ok';
+  btn.innerHTML = '<i class="fas fa-check" style="font-size:0.65rem"></i> Copied!';
+  showJbCopyNotification();
+  setTimeout(() => {
+    btn.className = 'jb-copy-btn';
+    btn.innerHTML = '<i class="fas fa-copy" style="font-size:0.65rem"></i> Copy';
+  }, 2000);
+}
+
+async function jbQuickDownload(id, btn) {
+  const p = jbPrompts.find(x => x.id === id);
+  if (!p) return;
+  const sanitized = p.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+  const filename = sanitized + '.txt';
+  const blob = new Blob([p.content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  btn.className = 'jb-download-btn ok';
+  btn.innerHTML = '<i class="fas fa-check" style="font-size:0.65rem"></i> Downloaded!';
+  setTimeout(() => {
+    btn.className = 'jb-download-btn';
+    btn.innerHTML = '<i class="fas fa-download" style="font-size:0.65rem"></i> Download';
+  }, 2000);
+}
+
+function showJbCopyNotification() {
+  const notification = document.getElementById('jbCopyNotification');
+  notification.classList.add('show');
+  const circle = notification.querySelector('circle');
+  const text = document.getElementById('jbCopyNotificationText');
+  let startTime = Date.now();
+  const duration = 2000;
+  const circumference = 2 * Math.PI * 45;
+  function updateProgress() {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    circle.style.strokeDashoffset = circumference * (1 - progress);
+    const remaining = Math.ceil((duration - elapsed) / 1000);
+    text.textContent = remaining > 0 ? remaining + 's' : 'Tersalin!';
+    if (progress < 1) requestAnimationFrame(updateProgress);
+  }
+  circle.style.strokeDasharray = circumference + '';
+  circle.style.strokeDashoffset = '0';
+  requestAnimationFrame(updateProgress);
+  setTimeout(() => notification.classList.remove('show'), duration);
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+// Jailbreak event listeners
+document.getElementById('jbSearchInput').addEventListener('input', (e) => {
+  jbQuery = e.target.value;
+  jbCurrentPage = 1;
+  jbApplyFiltersAndRender();
+});
+document.getElementById('jbSortSel').addEventListener('change', (e) => {
+  jbSort = e.target.value;
+  jbCurrentPage = 1;
+  jbApplyFiltersAndRender();
+});
+document.getElementById('jbLengthFilter').addEventListener('change', (e) => {
+  jbLengthFilter = e.target.value;
+  jbCurrentPage = 1;
+  jbApplyFiltersAndRender();
+});
+document.getElementById('jbOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'jbOverlay') closeJbModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeJbModal();
+});
+
+// ===== SETTINGS =====
+function toggleSetting(el, key) {
+  el.classList.toggle('active');
+  const active = el.classList.contains('active');
+  localStorage.setItem('matrix_' + key, active);
+  if (key === 'matrixRain') canvas.style.display = active ? 'block' : 'none';
+  if (key === 'scanline') {
+    const sl = document.querySelector('.scanlines');
+    if (sl) sl.style.display = active ? 'block' : 'none';
+  }
+  showToast(key + ' ' + (active ? 'enabled' : 'disabled'));
+}
+
+function loadSettings() {
+  const matrixRain = localStorage.getItem('matrix_matrixRain') !== 'false';
+  const scanline = localStorage.getItem('matrix_scanline') !== 'false';
+  const s1 = document.getElementById('settingMatrixRain');
+  const s2 = document.getElementById('settingScanline');
+  if (s1) s1.classList.toggle('active', matrixRain);
+  if (s2) s2.classList.toggle('active', scanline);
+  canvas.style.display = matrixRain ? 'block' : 'none';
+  const sl = document.querySelector('.scanlines');
+  if (sl) sl.style.display = scanline ? 'block' : 'none';
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  setInterval(() => {
+    const users = document.getElementById('statUsers');
+    const reqs = document.getElementById('statRequests');
+    const dash = document.getElementById('page-dashboard');
+    if (dash && dash.classList.contains('active')) {
+      if (users) users.textContent = (1247 + Math.floor(Math.random() * 50)).toLocaleString();
+      if (reqs) reqs.textContent = (8.5 + Math.random() * 0.5).toFixed(1) + 'K';
+    }
+  }, 3000);
+});
+
+window.addEventListener('resize', () => {
+  const dash = document.getElementById('page-dashboard');
+  if (dash && dash.classList.contains('active')) drawCharts();
+});
+</script>
+</body>
+</html>
